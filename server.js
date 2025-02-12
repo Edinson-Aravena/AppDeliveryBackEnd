@@ -29,13 +29,14 @@ app.disable('x-powered-by');
 
 app.set('port', port);
 
+
 /*
  * Route call
 */
 usersRoutes(app);
 
 server.listen(3000, myIP || 'localhost', function(){
-    console.log('App delivery '+ process.pid + ' Iniciada' + ' corriendo el el puerto ' + port)
+    console.log('App delivery Iniciada corriendo el el puerto ' + port)
 })
 
 app.get('/', (req, res) => {
