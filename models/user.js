@@ -5,17 +5,35 @@ const User = {};
 
 User.findById = (id, result) =>{
     const sql = `
-        SELECT 
-            id, 
-            email,
-            name,
-            lastname,
-            image,
-            password
-        FROM
-            users
-        WHERE
+         select
+            U.id, 
+            U.email,
+            U.name,
+            U.lastname,
+            U.image,
+            U.password,
+            json_arrayagg(
+				json_object(
+					'id', CONVERT(R.id, char),
+                    'name', R.name,
+                    'image', R.image,
+                    'route', R.route
+                )
+            ) as roles
+        from
+            users as U
+		inner join 
+			user_has_roles as UHR
+		ON
+			UHR.id_user= u.id
+		inner join 
+			roles as R
+		on
+			UHR.id_rol = r.id
+        where
             id = ?
+		group by
+			U.id
     `
 
     db.query(
@@ -35,17 +53,35 @@ User.findById = (id, result) =>{
 
 User.findByEmail = (email, result) =>{
     const sql = `
-        SELECT 
-            id, 
-            email,
-            name,
-            lastname,
-            image,
-            password
-        FROM
-            users
-        WHERE
+        select
+            U.id, 
+            U.email,
+            U.name,
+            U.lastname,
+            U.image,
+            U.password,
+            json_arrayagg(
+				json_object(
+					'id', CONVERT(R.id, char),
+                    'name', R.name,
+                    'image', R.image,
+                    'route', R.route
+                )
+            ) as roles
+        from
+            users as U
+		inner join 
+			user_has_roles as UHR
+		ON
+			UHR.id_user= u.id
+		inner join 
+			roles as R
+		on
+			UHR.id_rol = r.id
+        where
             email = ?
+		group by
+			U.id
     `
 
     db.query(

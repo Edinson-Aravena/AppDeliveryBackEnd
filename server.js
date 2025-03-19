@@ -8,6 +8,8 @@ const logger = require('morgan');
 const cors = require('cors');
 const passport = require('passport')
 
+const multer = require('multer')
+
 const myIP = require('./getMyIP')
 
 /*
@@ -34,11 +36,13 @@ app.disable('x-powered-by');
 
 app.set('port', port);
 
-
+const upload = multer({
+    storage: multer.memoryStorage()
+})
 /*
  * Route call
 */
-usersRoutes(app);
+usersRoutes(app, upload);
 
 server.listen(3000, myIP || 'localhost', function(){
     console.log('App delivery Iniciada corriendo el el puerto ' + port)
