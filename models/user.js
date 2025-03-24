@@ -3,14 +3,15 @@ const bcrypt = require('bcryptjs')
 
 const User = {};
 
-User.findById = (id, result) =>{
+User.findById = (id, result) => {
     const sql = `
-         select
+        select
             U.id, 
             U.email,
             U.name,
             U.lastname,
             U.image,
+            U.phone,
             U.password,
             json_arrayagg(
 				json_object(
@@ -31,7 +32,7 @@ User.findById = (id, result) =>{
 		on
 			UHR.id_rol = r.id
         where
-            id = ?
+            U.id = ?
 		group by
 			U.id
     `
@@ -40,10 +41,10 @@ User.findById = (id, result) =>{
         sql,
         [id],
         (err, user) => {
-            if(err){
-                console.log('Error:'+ user)
+            if (err) {
+                console.log('Error:' + user)
                 result(err, null)
-            }else{
+            } else {
                 console.log('User Obtain:', user[0])
                 result(null, user[0])
             }
@@ -51,7 +52,7 @@ User.findById = (id, result) =>{
     )
 }
 
-User.findByEmail = (email, result) =>{
+User.findByEmail = (email, result) => {
     const sql = `
         select
             U.id, 
@@ -59,6 +60,7 @@ User.findByEmail = (email, result) =>{
             U.name,
             U.lastname,
             U.image,
+            U.phone,
             U.password,
             json_arrayagg(
 				json_object(
@@ -88,10 +90,10 @@ User.findByEmail = (email, result) =>{
         sql,
         [email],
         (err, user) => {
-            if(err){
-                console.log('Error:'+ user)
+            if (err) {
+                console.log('Error:' + user)
                 result(err, null)
-            }else{
+            } else {
                 console.log('User Obtain:', user[0])
                 result(null, user[0])
             }
@@ -118,7 +120,7 @@ User.create = async (user, result) => {
     `
 
     db.query(
-        sql, 
+        sql,
         [
             user.email,
             user.name,
@@ -130,15 +132,87 @@ User.create = async (user, result) => {
             new Date(),
         ],
         (err, res) => {
-            if(err){
-                console.log('Error:'+ err)
+            if (err) {
+                console.log('Error:' + err)
                 result(err, null)
-            }else{
+            } else {
                 console.log('ID new user:', res.insertId)
                 result(null, res.insertId)
             }
         }
     )
 }
+
+User.update = (user, result) => { 
+    const sql = `
+        update
+            users
+        set
+            name = ?,
+            lastName = ?,
+            phone = ?,
+            image = ?,
+            updated_at = ?
+        where
+            id = ? 
+    `;
+    //no recuerdo si era id = ?, cambiar o revisar si hay error
+    db.query(
+        sql,
+        [
+            user.name,
+            user.lastname,
+            user.phone,
+            user.image,
+            new Date(),
+            user.id,
+        ],
+        (err, res) => {
+            if (err) {
+                console.log('Error:' + err)
+                result(err, null)
+            } else {
+                console.log('updated user', user.id)
+                result(null, user.id)
+            }
+        }
+    )
+
+} 
+
+User.updateWithOutImage = (user, result) => { 
+    const sql = `
+        update
+            users
+        set
+            name = ?,
+            lastName = ?,
+            phone = ?,
+            updated_at = ?
+        where
+            id = ? 
+    `;
+
+    db.query(
+        sql,
+        [
+            user.name,
+            user.lastname,
+            user.phone,
+            new Date(),
+            user.id,
+        ],
+        (err, res) => {
+            if (err) {
+                console.log('Error:' + err)
+                result(err, null)
+            } else {
+                console.log('updated user', user.id)
+                result(null, user.id)
+            }
+        }
+    )
+
+} 
 
 module.exports = User;

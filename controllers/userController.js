@@ -124,5 +124,54 @@ module.exports = {
                 })
             });
         })
+    },
+
+    async updateWithImage(req, res) {
+        const user = JSON.parse(req.body.user);
+        const files = req.files;
+
+        if (files) {
+            const path = `image_${Date.now()}`;
+            const url = await storage(files[0], path); // upload image
+
+            if (url) {
+                user.image = url;
+            }
+        }
+        User.update(user, (err, data) => {
+            if (err) {
+                return res.status(501).json({
+                    success: false,
+                    message: 'Hubo un erro con la actualizacion del usuario',
+                    error: err
+                })
+            }
+
+            return res.status(201).json({
+                success: true,
+                message: 'El usuario se actualizo correctamente',
+                data: user
+            })
+        })
+    },
+
+    async updateWithOutImage(req, res) {
+        const user = req.body;
+
+        User.updateWithOutImage(user, (err, data) => {
+            if (err) {
+                return res.status(501).json({
+                    success: false,
+                    message: 'Hubo un erro con la actualizacion del usuario',
+                    error: err
+                })
+            }
+
+            return res.status(201).json({
+                success: true,
+                message: 'El usuario se actualizo correctamente',
+                data: user
+            })
+        })
     }
 }
