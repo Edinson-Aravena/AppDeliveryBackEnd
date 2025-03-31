@@ -1,5 +1,6 @@
 use delivery_app;
 
+-- USERS
 create table users(
 	id BIGINT PRIMARY KEY AUTO_INCREMENT,
     email VARCHAR(100) NOT NULL UNIQUE,
@@ -12,6 +13,7 @@ create table users(
     updated_at timestamp(0)
 );
 
+-- ROLES
 create table roles(
 	id bigint primary key auto_increment,
     name varchar(90) not null unique,
@@ -66,3 +68,13 @@ create table user_has_roles(
     foreign key(id_rol) references roles(id) on update cascade on delete cascade,
     primary key(id_user, id_rol)
 );
+
+-- CATEGORIES
+create table catregories(
+	id bigint primary key auto_increment,
+    name varchar(50) not null,
+    description text not null,
+    image varchar(255) null,
+    created_at timestamp(0) not null,
+	updated_at timestamp(0) not null
+)
