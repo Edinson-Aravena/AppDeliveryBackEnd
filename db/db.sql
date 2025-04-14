@@ -78,3 +78,16 @@ create table catregories(
     created_at timestamp(0) not null,
 	updated_at timestamp(0) not null
 )
+
+-- PRODUCTS
+create table products(
+	id bigint primary key auto_increment,
+    name varchar(180) not null,
+    description text not null,
+    price decimal not null,
+    image1 varchar(255) not null,
+    id_category bigint not null,
+    created_at timestamp(0) not null,
+    updated_at timestamp(0) not null,
+    foreign key(id_category) references categories(id) on update cascade on delete cascade
+)
