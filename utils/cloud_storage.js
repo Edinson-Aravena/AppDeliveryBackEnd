@@ -66,8 +66,8 @@ module.exports = (file, pathImage, deletePathImage) => {
                     console.log('URL DE CLOUD STORAGE ', url);
                     resolve(url);
                 });
-
-                blobStream.end(file.buffer);
+                
+                blobStream.end(file.buffer);//
             }
         }
     });

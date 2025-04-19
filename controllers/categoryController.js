@@ -18,7 +18,7 @@ module.exports = {
     async create(req, res) {
             const category = JSON.parse(req.body.category);
             const files = req.files;
-    
+
             if (files) {
                 const path = `image_${Date.now()}`;
                 const url = await storage(files[0], path); // upload image
