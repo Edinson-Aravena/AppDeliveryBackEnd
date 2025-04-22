@@ -1,6 +1,38 @@
 const db = require('../config/config');
 const Product = {};
 
+Product.findByCategory = (id_category, result) => {
+    const sql = `
+        select
+            P.id,
+            P.name,
+            P.description,
+            P.price,
+            P.image1,
+            P.image2,
+            P.image3,
+            P.id_category
+        from 
+            products as P
+        where
+            P.id_category = ?
+        `;
+
+        db.query(
+            sql,
+            [id_category],
+            (err, res) => {
+                if (err) {
+                    console.log('Error:' + err);
+                    result(err, null);
+                } else {
+                    console.log('ID del nuevo producto', res);
+                    result(null, res);
+                }
+            }
+        );
+
+}
 
 Product.create = (product, result) => {
 
@@ -81,5 +113,29 @@ Product.update = (product, result) => {
     );
 
 }
+
+Product.delete = (id, result) => {
+    sql = `
+        delete from 
+            products
+        where
+            id = ?
+    `;
+
+    db.query(
+        sql,
+        [id],
+        (err, res) => {
+            if (err) {
+                console.log('Error:' + err);
+                result(err, null);
+            } else {
+                console.log('ID del producto eliminado', id);
+                result(null, id);
+            }
+        }
+    );
+}
+
 
 module.exports = Product;

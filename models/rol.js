@@ -21,7 +21,7 @@ Rol.create = (id_user, id_rol, result) => {
                 console.log('Error:'+ err)
                 result(err, null)
             }else{
-                console.log('id rol-user Obtain:', res.insertId)
+                //console.log('id rol-user Obtain:', res.insertId)
                 result(null, res.insertId)
             }
         }

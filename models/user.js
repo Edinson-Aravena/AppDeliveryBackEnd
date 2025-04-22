@@ -42,10 +42,10 @@ User.findById = (id, result) => {
         [id],
         (err, user) => {
             if (err) {
-                console.log('Error:' + user)
+                //console.log('Error:' + user)
                 result(err, null)
             } else {
-                console.log('User Obtain:', user[0])
+                //console.log('User Obtain:', user[0])
                 result(null, user[0])
             }
         }

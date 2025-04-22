@@ -73,7 +73,6 @@ module.exports = {
         },
         async update(req, res) {
             const category = req.body;
-            console.log("Category", category);
             Category.update(category, (err, id) => {
                 if (err) {
                     return res.status(501).json({

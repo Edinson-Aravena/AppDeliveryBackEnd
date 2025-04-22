@@ -21,7 +21,7 @@ Category.getAll = (result) => {
                 console.log('Error:' + err);
                 result(err, null);
             } else {
-                console.log('Categorys:', data);
+                //console.log('Categorys:', data);
                 result(null, data);
             }
         }
