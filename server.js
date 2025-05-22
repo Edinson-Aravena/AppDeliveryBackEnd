@@ -22,6 +22,7 @@ const swaggerJSDoc = require('swagger-jsdoc');
 const usersRoutes = require('./routes/userRoutes')
 const categoriesRoutes = require('./routes/categoriesRoutes')
 const productsRoutes = require('./routes/productsRoutes')
+const addressRoutes = require('./routes/addressRoutes')
 
 const port = process.env.PORT || 3000;
 
@@ -85,6 +86,8 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 usersRoutes(app, upload);
 categoriesRoutes(app, upload);
 productsRoutes(app, upload);
+addressRoutes(app)
+
 
 server.listen(3000, myIP || 'localhost', function () {
     console.log('App delivery Iniciada corriendo el el puerto ' + port)

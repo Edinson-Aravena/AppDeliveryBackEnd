@@ -93,3 +93,16 @@ create table products(
     updated_at timestamp(0) not null,
     foreign key(id_category) references categories(id) on update cascade on delete cascade
 )
+
+-- ORDERS
+create table  address(
+	id bigint primary key auto_increment,
+    address varchar(255) not null,
+    neighborhood varchar(180) not null,
+    lat double not null,
+    lng double not null,
+    created_at timestamp(0) not null,
+    updated_at timestamp(0) not null,
+    id_user bigint not null,
+    foreign key (id_user) references users(id) on update cascade on delete cascade
+);
