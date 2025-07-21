@@ -23,6 +23,7 @@ const usersRoutes = require('./routes/userRoutes')
 const categoriesRoutes = require('./routes/categoriesRoutes')
 const productsRoutes = require('./routes/productsRoutes')
 const addressRoutes = require('./routes/addressRoutes')
+const orderRoutes = require('./routes/orderRoutes')
 
 const port = process.env.PORT || 3000;
 
@@ -56,7 +57,7 @@ const swaggerDefinition = {
     },
     servers: [
         {
-            url: `http://${myIP}:${port}`, // usa tu IP dinámica o localhost
+            url: `http://${myIP}:${port}`, 
             description: 'Servidor de desarrollo',
         },
     ],
@@ -87,6 +88,7 @@ usersRoutes(app, upload);
 categoriesRoutes(app, upload);
 productsRoutes(app, upload);
 addressRoutes(app)
+orderRoutes(app);
 
 
 server.listen(3000, myIP || 'localhost', function () {

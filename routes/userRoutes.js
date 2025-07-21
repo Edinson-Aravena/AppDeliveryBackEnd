@@ -132,4 +132,18 @@ module.exports = (app, upload) => {
      *         description: No autorizado
      */
     app.put('/api/users/updateWithOutImage', passport.authenticate('jwt', { session:false }), userController.updateWithOutImage);
+
+    /**
+     * @swagger
+     * /api/users/findeDeliveryMen:
+     *   get:
+     *     summary: Obtener lista de repartidores
+     *     tags: [Users]
+     *     security:
+     *       - bearerAuth: []
+     *     responses:
+     *       200:
+     *         description: Lista de repartidores obtenida exitosamente
+     */
+    app.get('/api/users/findeDeliveryMen', passport.authenticate('jwt', { session:false }), userController.findeDeliveryMen);
 }

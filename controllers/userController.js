@@ -20,14 +20,14 @@ module.exports = {
             if (err) {
                 return res.status(501).json({
                     success: false,
-                    message: 'There was an error with user registration',
+                    message: 'Hubo un error al buscar el usuario',
                     error: err
                 })
             }
             if (!myUser) {
                 return res.status(401).json({
                     success: false,
-                    message: 'Email not found',
+                    message: 'El usuario no existe', //Correo no encontrado
                 })
             }
 
@@ -52,14 +52,14 @@ module.exports = {
 
                 return res.status(200).json({
                     success: true,
-                    message: 'Authenticated User',
+                    message: 'Usuario logueado correctamente',
                     data: data//id new user register
                 })
             }
             else {
                 return res.status(401).json({
                     success: false,
-                    message: 'Incorrect Password',
+                    message: 'La contraseña o email es incorrecto', //Contraseña incorrecta
                 })
             }
         })
@@ -70,14 +70,14 @@ module.exports = {
             if (err) {
                 return res.status(501).json({
                     success: false,
-                    message: 'There was an error with user registration',
+                    message: 'hubo un error con el registro del usuario',
                     error: err
                 })
             }
 
             return res.status(200).json({
                 success: true,
-                message: 'User registration was successful',
+                message: 'Usuario registrado correctamente',
                 data: data//id new user register
             })
         })
@@ -98,7 +98,7 @@ module.exports = {
             if (err) {
                 return res.status(501).json({
                     success: false,
-                    message: 'There was an error with user registration',
+                    message: 'Hubo un error con el registro del usuario',
                     error: err
                 })
             }
@@ -171,6 +171,24 @@ module.exports = {
                 success: true,
                 message: 'El usuario se actualizo correctamente',
                 data: user
+            })
+        })
+    },
+
+    async findeDeliveryMen(req, res) {
+        User.findeDeliveryMen((err, data) => {
+            if (err) {
+                return res.status(501).json({
+                    success: false,
+                    message: 'Hubo un error al buscar los repartidores',
+                    error: err
+                })
+            }
+
+            return res.status(200).json({
+                success: true,
+                message: 'Repartidores encontrados correctamente',
+                data: data
             })
         })
     }

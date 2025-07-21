@@ -3,7 +3,21 @@ const storage = require('../utils/cloud_storage');
 
 module.exports = {
 
+    async findByUser(req, res) {
+        const  id_user  = req.params.id_user;
 
+        Address.findByUser(id_user, (err, data) => {
+            if (err) {
+                return res.status(500).json({
+                    success: false,
+                    message: 'Hubo un error al obtener las direcciones',
+                    error: err
+                });
+            }
+
+            return res.status(200).json(data);
+        });
+    },
     async create(req, res) {
         const address = req.body;
 

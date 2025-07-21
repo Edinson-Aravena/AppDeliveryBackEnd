@@ -101,6 +101,41 @@ User.findByEmail = (email, result) => {
     )
 }
 
+User.findeDeliveryMen = (result) => {
+    const sql = `
+        select
+            U.id, 
+            U.email,
+            U.name,
+            U.lastname,
+            U.image,
+            U.phone
+        from
+            users as U
+        inner join
+            user_has_roles as UHR
+        on
+            UHR.id_user = U.id
+        inner join
+            roles as R
+        on
+            UHR.id_rol = R.id
+        where
+            R.id= 2
+        `;
+
+    db.query(
+        sql,
+        (err, data) => {
+            if (err) {
+                console.log('Error:' + err)
+                result(err, null)
+            } else {
+                result(null, data)
+            }
+        }
+    )
+}
 User.create = async (user, result) => {
 
     const hash = await bcrypt.hash(user.password, 10)
@@ -143,7 +178,7 @@ User.create = async (user, result) => {
     )
 }
 
-User.update = (user, result) => { 
+User.update = (user, result) => {
     const sql = `
         update
             users
@@ -178,9 +213,9 @@ User.update = (user, result) => {
         }
     )
 
-} 
+}
 
-User.updateWithOutImage = (user, result) => { 
+User.updateWithOutImage = (user, result) => {
     const sql = `
         update
             users
@@ -213,6 +248,6 @@ User.updateWithOutImage = (user, result) => {
         }
     )
 
-} 
+}
 
 module.exports = User;
