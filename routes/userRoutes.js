@@ -145,5 +145,5 @@ module.exports = (app, upload) => {
      *       200:
      *         description: Lista de repartidores obtenida exitosamente
      */
-    app.get('/api/users/findeDeliveryMen', passport.authenticate('jwt', { session:false }), userController.findeDeliveryMen);
+    app.get('/api/users/findDeliveryMen', passport.authenticate('jwt', { session:false }), userController.findeDeliveryMen);
 }
