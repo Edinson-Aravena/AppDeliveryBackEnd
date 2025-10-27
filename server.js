@@ -25,7 +25,7 @@ const productsRoutes = require('./routes/productsRoutes')
 const addressRoutes = require('./routes/addressRoutes')
 const orderRoutes = require('./routes/orderRoutes')
 
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 3001;
 
 app.use(logger('dev'));
 app.use(express.json());
@@ -33,7 +33,14 @@ app.use(express.urlencoded({
     extended: true
 }))
 
-app.use(cors())
+// Configuración de CORS para permitir peticiones del frontend Next.js
+app.use(cors({
+    origin: ['http://localhost:3000', 'http://localhost:3001', 'http://localhost:3002', 'http://localhost:3003'],
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+}))
+
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -91,7 +98,7 @@ addressRoutes(app)
 orderRoutes(app);
 
 
-server.listen(3000, myIP || 'localhost', function () {
+server.listen(port, myIP || 'localhost', function () {
     console.log('App delivery Iniciada corriendo el el puerto ' + port)
 })
 

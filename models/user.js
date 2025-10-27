@@ -52,16 +52,18 @@ User.findById = (id, result) => {
     )
 }
 
-User.findByEmail = (email, result) => {
+User.findByEmail = (emailOrUsername, result) => {
     const sql = `
         select
             U.id, 
             U.email,
+            U.username,
             U.name,
             U.lastname,
             U.image,
             U.phone,
             U.password,
+            U.role,
             json_arrayagg(
 				json_object(
 					'id', CONVERT(R.id, char),
@@ -72,23 +74,23 @@ User.findByEmail = (email, result) => {
             ) as roles
         from
             users as U
-		inner join 
+		left join 
 			user_has_roles as UHR
 		ON
 			UHR.id_user= u.id
-		inner join 
+		left join 
 			roles as R
 		on
 			UHR.id_rol = r.id
         where
-            email = ?
+            U.email = ? OR U.username = ?
 		group by
 			U.id
     `
 
     db.query(
         sql,
-        [email],
+        [emailOrUsername, emailOrUsername],
         (err, user) => {
             if (err) {
                 console.log('Error:' + user)
@@ -143,26 +145,30 @@ User.create = async (user, result) => {
         INSERT INTO
             users(
                 email,
+                username,
                 name,
                 lastname,
                 phone,
                 image,
                 password,
+                role,
                 created_at,
                 updated_at
             )
-        VALUES(?,?,?,?,?,?,?,?)
+        VALUES(?,?,?,?,?,?,?,?,?,?)
     `
 
     db.query(
         sql,
         [
-            user.email,
+            user.email || null,
+            user.username || null,
             user.name,
-            user.lastname,
-            user.phone,
-            user.image,
+            user.lastname || null,
+            user.phone || null,
+            user.image || null,
             hash,
+            user.role || 'WAITER',
             new Date(),
             new Date(),
         ],

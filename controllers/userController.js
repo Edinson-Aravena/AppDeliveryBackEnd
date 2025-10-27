@@ -10,13 +10,10 @@ const { use } = require('passport');
 module.exports = {
 
     login(req, res) {
-        const email = req.body.email;
+        const emailOrUsername = req.body.email || req.body.username;
         const password = req.body.password;
 
-        User.findByEmail(email, async (err, myUser) => {
-            //console.log('El usaurio:', myUser)
-            //console.log('error:', err)
-
+        User.findByEmail(emailOrUsername, async (err, myUser) => {
             if (err) {
                 return res.status(501).json({
                     success: false,
@@ -27,7 +24,7 @@ module.exports = {
             if (!myUser) {
                 return res.status(401).json({
                     success: false,
-                    message: 'El usuario no existe', //Correo no encontrado
+                    message: 'El usuario no existe',
                 })
             }
 
@@ -36,7 +33,8 @@ module.exports = {
             if (isPasswordValid) {
                 const token = jwt.sign({
                     id: myUser.id,
-                    email: myUser.email
+                    email: myUser.email,
+                    username: myUser.username
                 }, keys.secretOrKey, {});
 
                 const data = {
@@ -44,8 +42,10 @@ module.exports = {
                     name: myUser.name,
                     lastname: myUser.lastname,
                     email: myUser.email,
+                    username: myUser.username,
                     phone: myUser.phone,
                     image: myUser.image,
+                    role: myUser.role,
                     session_token: `JWT ${token}`,
                     roles: myUser.roles
                 }
@@ -53,13 +53,13 @@ module.exports = {
                 return res.status(200).json({
                     success: true,
                     message: 'Usuario logueado correctamente',
-                    data: data//id new user register
+                    data: data
                 })
             }
             else {
                 return res.status(401).json({
                     success: false,
-                    message: 'La contraseña o email es incorrecto', //Contraseña incorrecta
+                    message: 'La contraseña es incorrecta',
                 })
             }
         })

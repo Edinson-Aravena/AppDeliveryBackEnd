@@ -1,7 +1,12 @@
-use delivery_app;
+-- Script de configuración de la base de datos unificada
+-- Ejecuta este script en MySQL para crear la base de datos y todas las tablas
+
+-- Crear la base de datos si no existe
+CREATE DATABASE IF NOT EXISTS delivery_app;
+USE delivery_app;
 
 -- USERS (Actualizado para soportar ambos sistemas)
-create table if not exists users(
+CREATE TABLE IF NOT EXISTS users(
 	id BIGINT PRIMARY KEY AUTO_INCREMENT,
     email VARCHAR(100) UNIQUE,
     username VARCHAR(90) UNIQUE,
@@ -16,7 +21,7 @@ create table if not exists users(
 );
 
 -- ROLES
-create table if not exists roles(
+CREATE TABLE IF NOT EXISTS roles(
 	id bigint primary key auto_increment,
     name varchar(90) not null unique,
     image varchar(255) null,
@@ -25,7 +30,8 @@ create table if not exists roles(
     updated_at timestamp(0) not null DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
-insert into roles(name, route) values
+-- Insertar roles iniciales
+INSERT INTO roles(name, route) VALUES
 ('RESTAURANTE', '/restaurant/orders/list'),
 ('REPARTIDOR', '/delivery/orders/list'),
 ('CLIENTE', '/client/orders/list'),
@@ -34,7 +40,8 @@ insert into roles(name, route) values
 ('WAITER', '/order/cafe')
 ON DUPLICATE KEY UPDATE route = VALUES(route);
 
-create table if not exists user_has_roles(
+-- Tabla intermedia Usuario-Roles
+CREATE TABLE IF NOT EXISTS user_has_roles(
 	id_user bigint not null,
     id_rol bigint not null,
     created_at timestamp(0) not null DEFAULT CURRENT_TIMESTAMP,
@@ -45,7 +52,7 @@ create table if not exists user_has_roles(
 );
 
 -- CATEGORIES (Actualizado para soportar ambos sistemas)
-create table if not exists categories(
+CREATE TABLE IF NOT EXISTS categories(
 	id bigint primary key auto_increment,
     name varchar(180) not null,
     description text,
@@ -57,7 +64,7 @@ create table if not exists categories(
 );
 
 -- PRODUCTS (Actualizado para soportar ambos sistemas)
-create table if not exists products(
+CREATE TABLE IF NOT EXISTS products(
 	id bigint primary key auto_increment,
     name varchar(180) not null,
     description text,
@@ -73,7 +80,7 @@ create table if not exists products(
 );
 
 -- ADDRESS
-create table if not exists address(
+CREATE TABLE IF NOT EXISTS address(
 	id bigint primary key auto_increment,
     address varchar(255) not null,
     neighborhood varchar(180) not null,
@@ -85,8 +92,8 @@ create table if not exists address(
     foreign key (id_user) references users(id) on update cascade on delete cascade
 );
 
--- DELIVERY ORDERS
-create table if not exists orders(
+-- DELIVERY ORDERS (Órdenes del sistema de delivery)
+CREATE TABLE IF NOT EXISTS orders(
 	id bigint primary key auto_increment,
     id_client bigint not null,
     id_delivery bigint null,
@@ -102,7 +109,8 @@ create table if not exists orders(
 	foreign key(id_address) references address(id) on update cascade on delete cascade
 );
 
-create table if not exists orders_has_products(
+-- Tabla intermedia Órdenes-Productos de Delivery
+CREATE TABLE IF NOT EXISTS orders_has_products(
 	id_order bigint not null,
     id_product bigint not null,
     quantity bigint not null,
@@ -114,7 +122,7 @@ create table if not exists orders_has_products(
 );
 
 -- QUIOSCO ORDERS (Órdenes del sistema de quiosco)
-create table if not exists orders_quiosco(
+CREATE TABLE IF NOT EXISTS orders_quiosco(
 	id int primary key auto_increment,
     name varchar(255) not null,
     total double not null,
@@ -125,7 +133,8 @@ create table if not exists orders_quiosco(
     order_delivered_at datetime null
 );
 
-create table if not exists order_products_quiosco(
+-- Tabla de productos del quiosco
+CREATE TABLE IF NOT EXISTS order_products_quiosco(
 	id int primary key auto_increment,
     order_id int not null,
     product_id bigint not null,
@@ -133,3 +142,11 @@ create table if not exists order_products_quiosco(
     foreign key(order_id) references orders_quiosco(id) on update cascade on delete cascade,
     foreign key(product_id) references products(id) on update cascade on delete cascade
 );
+
+-- Crear un usuario admin por defecto (password: admin123)
+-- Hash bcrypt para 'admin123'
+INSERT INTO users(username, name, password, role) VALUES
+('admin', 'Administrador', '$2a$10$xN0dXvBSFjOXqFqN8z6mRuGfYQPU7lHGJ/3OhKCkYK8vr9dXK6L2q', 'ADMIN')
+ON DUPLICATE KEY UPDATE username = username;
+
+SELECT 'Base de datos configurada exitosamente!' as Mensaje;
