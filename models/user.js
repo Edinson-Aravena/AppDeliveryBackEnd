@@ -8,11 +8,13 @@ User.findById = (id, result) => {
         select
             U.id, 
             U.email,
+            U.username,
             U.name,
             U.lastname,
             U.image,
             U.phone,
             U.password,
+            U.role,
             json_arrayagg(
 				json_object(
 					'id', CONVERT(R.id, char),
@@ -123,7 +125,7 @@ User.findeDeliveryMen = (result) => {
         on
             UHR.id_rol = R.id
         where
-            R.id= 2
+            R.id = 6
         `;
 
     db.query(
@@ -168,7 +170,7 @@ User.create = async (user, result) => {
             user.phone || null,
             user.image || null,
             hash,
-            user.role || 'WAITER',
+            user.role || null,
             new Date(),
             new Date(),
         ],

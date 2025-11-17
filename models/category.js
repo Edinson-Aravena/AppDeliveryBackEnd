@@ -7,7 +7,8 @@ Category.getAll = (result) => {
             id,
             name,
             description,
-            image
+            image,
+            slug
         from 
             categories
         order by

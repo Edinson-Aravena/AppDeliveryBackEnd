@@ -66,20 +66,79 @@ module.exports = {
     },
     register(req, res) {
         const user = req.body;
+        
+        // Imagen por defecto si no se proporciona
+        if (!user.image || user.image === '') {
+            user.image = 'https://ui-avatars.com/api/?name=' + encodeURIComponent(user.name + ' ' + (user.lastname || '')) + '&size=200&background=random';
+        }
+        
+        // Mapeo de roles a IDs
+        const roleMap = {
+            'ADMIN': 1,
+            'CHEF': 2,
+            'WAITER': 3,
+            'CLIENTE': 4,
+            'RESTAURANTE': 5,
+            'REPARTIDOR': 6
+        };
+        
+        // Si viene un rol del frontend web, usarlo; si no, CLIENTE por defecto (móvil)
+        const roleId = user.role ? roleMap[user.role] : 4;
+        
         User.create(user, (err, data) => {
             if (err) {
                 return res.status(501).json({
                     success: false,
-                    message: 'hubo un error con el registro del usuario',
+                    message: 'Hubo un error con el registro del usuario',
                     error: err
                 })
             }
 
-            return res.status(200).json({
-                success: true,
-                message: 'Usuario registrado correctamente',
-                data: data//id new user register
-            })
+            user.id = `${data}`;
+
+            const token = jwt.sign({ id: user.id, email: user.email }, keys.secretOrKey, {});
+            user.session_token = `JWT ${token}`;
+
+            // Asignar rol según el parámetro recibido
+            Rol.create(user.id, roleId, (err, roleData) => {
+                if (err) {
+                    console.error('Error asignando rol:', err);
+                    return res.status(501).json({
+                        success: false,
+                        message: 'Hubo un error con el registro del rol de usuario',
+                        error: err
+                    })
+                }
+
+                // Obtener información completa del usuario con sus roles
+                User.findById(user.id, (err, userWithRoles) => {
+                    if (err) {
+                        console.error('Error buscando usuario:', err);
+                        return res.status(501).json({
+                            success: false,
+                            message: 'Usuario creado pero hubo un error al obtener la información completa',
+                            error: err
+                        })
+                    }
+
+                    if (!userWithRoles) {
+                        console.error('Usuario no encontrado después de crear');
+                        return res.status(404).json({
+                            success: false,
+                            message: 'Usuario creado pero no se encontró en la base de datos'
+                        })
+                    }
+
+                    // Agregar el token al usuario
+                    userWithRoles.session_token = user.session_token;
+
+                    return res.status(201).json({
+                        success: true,
+                        message: 'Usuario registrado correctamente',
+                        data: userWithRoles
+                    })
+                });
+            });
         })
     },
     async registerWithImage(req, res) {

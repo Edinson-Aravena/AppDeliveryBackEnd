@@ -24,6 +24,8 @@ const categoriesRoutes = require('./routes/categoriesRoutes')
 const productsRoutes = require('./routes/productsRoutes')
 const addressRoutes = require('./routes/addressRoutes')
 const orderRoutes = require('./routes/orderRoutes')
+const paymentRoutes = require('./routes/paymentRoutes')
+const paymentMethodRoutes = require('./routes/paymentMethodRoutes')
 
 const port = process.env.PORT || 3001;
 
@@ -96,6 +98,8 @@ categoriesRoutes(app, upload);
 productsRoutes(app, upload);
 addressRoutes(app)
 orderRoutes(app);
+paymentRoutes(app);
+paymentMethodRoutes(app);
 
 
 server.listen(port, myIP || 'localhost', function () {

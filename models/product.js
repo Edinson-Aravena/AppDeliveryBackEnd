@@ -8,9 +8,9 @@ Product.findByCategory = (id_category, result) => {
             P.name,
             P.description,
             P.price,
-            P.image1,
-            P.image2,
-            P.image3,
+            COALESCE(P.image1, P.image) as image1,
+            COALESCE(P.image2, P.image) as image2,
+            COALESCE(P.image3, P.image) as image3,
             P.id_category
         from 
             products as P
@@ -26,7 +26,7 @@ Product.findByCategory = (id_category, result) => {
                     console.log('Error:' + err);
                     result(err, null);
                 } else {
-                    console.log('ID del nuevo producto', res);
+                    console.log('Productos encontrados', res);
                     result(null, res);
                 }
             }
