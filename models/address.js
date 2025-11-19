@@ -62,6 +62,24 @@ Address.create = (address, result) => {
 
 }
 
+Address.delete = (id, result) => {
+    const sql = `
+        DELETE FROM address WHERE id = ?
+    `;
 
+    db.query(
+        sql,
+        [id],
+        (err, res) => {
+            if (err) {
+                console.log('Error:', err);
+                result(err, null);
+            } else {
+                console.log('Dirección eliminada:', id);
+                result(null, res);
+            }
+        }
+    );
+}
 
 module.exports = Address;

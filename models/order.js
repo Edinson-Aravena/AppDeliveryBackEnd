@@ -38,9 +38,9 @@ Order.findByStatus = (status, result) => {
                 'id', convert(P.id, char),
                 'name', P.name,
                 'description', P.description,
-                'image1', P.image1,
-                'image2', P.image2,
-                'image3', P.image3,
+                'image1', COALESCE(P.image1, P.image),
+                'image2', COALESCE(P.image2, P.image),
+                'image3', COALESCE(P.image3, P.image),
                 'price', P.price,
                 'quantity', OHP.quantity
             )
@@ -124,9 +124,9 @@ Order.findByDeliveryAndStatus = (id_delivery, status, result) => {
                 'id', convert(P.id, char),
                 'name', P.name,
                 'description', P.description,
-                'image1', P.image1,
-                'image2', P.image2,
-                'image3', P.image3,
+                'image1', COALESCE(P.image1, P.image),
+                'image2', COALESCE(P.image2, P.image),
+                'image3', COALESCE(P.image3, P.image),
                 'price', P.price,
                 'quantity', OHP.quantity
             )
@@ -211,9 +211,9 @@ Order.findByClientAndStatus= (id_client, status, result) => {
                 'id', convert(P.id, char),
                 'name', P.name,
                 'description', P.description,
-                'image1', P.image1,
-                'image2', P.image2,
-                'image3', P.image3,
+                'image1', COALESCE(P.image1, P.image),
+                'image2', COALESCE(P.image2, P.image),
+                'image3', COALESCE(P.image3, P.image),
                 'price', P.price,
                 'quantity', OHP.quantity
             )

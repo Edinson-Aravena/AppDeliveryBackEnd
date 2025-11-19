@@ -38,4 +38,23 @@ module.exports = {
             })
         })
     },
+
+    async delete(req, res) {
+        const id = req.params.id;
+
+        Address.delete(id, (err, data) => {
+            if (err) {
+                return res.status(500).json({
+                    success: false,
+                    message: 'Hubo un error al eliminar la dirección',
+                    error: err
+                });
+            }
+
+            return res.status(200).json({
+                success: true,
+                message: 'La dirección se eliminó correctamente'
+            });
+        });
+    },
 }

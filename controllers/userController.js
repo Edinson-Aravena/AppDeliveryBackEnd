@@ -5,6 +5,7 @@ const jwt = require('jsonwebtoken');
 const keys = require('../config/keys');
 
 const storage = require('../utils/cloud_storage');
+const uploadToCloudinary = require('../utils/cloudinary_storage');
 const { use } = require('passport');
 
 module.exports = {
@@ -142,76 +143,126 @@ module.exports = {
         })
     },
     async registerWithImage(req, res) {
-        const user = JSON.parse(req.body.user);
-        const files = req.files;
+        try {
+            const user = JSON.parse(req.body.user);
+            const files = req.files;
 
-        if (files) {
-            const path = `image_${Date.now()}`;
-            const url = await storage(files[0], path); // upload image
-
-            if (url) {
-                user.image = url;
+            if (files && files.length > 0) {
+                const url = await uploadToCloudinary(files[0], 'users');
+                
+                if (url) {
+                    user.image = url;
+                }
             }
-        }
-        User.create(user, (err, data) => {
-            if (err) {
-                return res.status(501).json({
-                    success: false,
-                    message: 'Hubo un error con el registro del usuario',
-                    error: err
-                })
-            }
-
-            user.id = `${data}`;
-
-            const token = jwt.sign({ id: user.id, email: user.email }, keys.secretOrKey, {});
-            user.session_token = `JWT ${token}`;
-
-            Rol.create(user.id, 3, (err, data) => {
+            
+            User.create(user, (err, data) => {
                 if (err) {
                     return res.status(501).json({
                         success: false,
-                        message: 'Hubo un error con el registro del rol de usuario',
+                        message: 'Hubo un error con el registro del usuario',
                         error: err
                     })
                 }
 
-                return res.status(201).json({
-                    success: true,
-                    message: 'El registro se realizo correctamente',
-                    data: user
-                })
+                user.id = `${data}`;
+
+                const token = jwt.sign({ id: user.id, email: user.email }, keys.secretOrKey, {});
+                user.session_token = `JWT ${token}`;
+
+                Rol.create(user.id, 3, (err, data) => {
+                    if (err) {
+                        return res.status(501).json({
+                            success: false,
+                            message: 'Hubo un error con el registro del rol de usuario',
+                            error: err
+                        })
+                    }
+
+                    return res.status(201).json({
+                        success: true,
+                        message: 'El registro se realizo correctamente',
+                        data: user
+                    })
+                });
+            })
+        } catch (error) {
+            console.error('Error in registerWithImage:', error);
+            return res.status(500).json({
+                success: false,
+                message: 'Error al subir la imagen durante el registro',
+                error: error.toString()
             });
-        })
+        }
     },
 
     async updateWithImage(req, res) {
-        const user = JSON.parse(req.body.user);
-        const files = req.files;
+        try {
+            const user = JSON.parse(req.body.user);
+            const files = req.files;
 
-        if (files) {
-            const path = `image_${Date.now()}`;
-            const url = await storage(files[0], path); // upload image
-
-            if (url) {
-                user.image = url;
+            if (files && files.length > 0) {
+                // Usar Cloudinary en lugar de Firebase Storage
+                const url = await uploadToCloudinary(files[0], 'users');
+                
+                if (url) {
+                    user.image = url;
+                }
             }
-        }
-        User.update(user, (err, data) => {
-            if (err) {
-                return res.status(501).json({
-                    success: false,
-                    message: 'Hubo un erro con la actualizacion del usuario',
-                    error: err
-                })
-            }
+            
+            User.update(user, (err, data) => {
+                if (err) {
+                    return res.status(501).json({
+                        success: false,
+                        message: 'Hubo un error con la actualización del usuario',
+                        error: err
+                    })
+                }
 
-            return res.status(201).json({
-                success: true,
-                message: 'El usuario se actualizo correctamente',
-                data: user
+                // Obtener el usuario completo con roles y token
+                User.findById(user.id, (err, userWithRoles) => {
+                    if (err) {
+                        return res.status(501).json({
+                            success: false,
+                            message: 'Usuario actualizado pero hubo un error al obtener la información completa',
+                            error: err
+                        })
+                    }
+
+                    if (!userWithRoles) {
+                        return res.status(404).json({
+                            success: false,
+                            message: 'Usuario actualizado pero no se encontró en la base de datos'
+                        })
+                    }
+
+                    // Parsear roles si viene como string
+                    if (typeof userWithRoles.roles === 'string') {
+                        try {
+                            userWithRoles.roles = JSON.parse(userWithRoles.roles);
+                        } catch (e) {
+                            console.error('Error parsing roles:', e);
+                            userWithRoles.roles = [];
+                        }
+                    }
+
+                    // Mantener el token de sesión original
+                    userWithRoles.session_token = user.session_token;
+
+                    return res.status(201).json({
+                        success: true,
+                        message: 'El usuario se actualizó correctamente',
+                        data: userWithRoles
+                    })
+                });
             })
-        })
+        } catch (error) {
+            console.error('Error in updateWithImage:', error);
+            return res.status(500).json({
+                success: false,
+                message: 'Error al subir la imagen',
+                error: error.toString()
+            });
+        }
     },
 
     async updateWithOutImage(req, res) {
@@ -221,16 +272,47 @@ module.exports = {
             if (err) {
                 return res.status(501).json({
                     success: false,
-                    message: 'Hubo un erro con la actualizacion del usuario',
+                    message: 'Hubo un error con la actualizacion del usuario',
                     error: err
                 })
             }
 
-            return res.status(201).json({
-                success: true,
-                message: 'El usuario se actualizo correctamente',
-                data: user
-            })
+            // Obtener el usuario completo con roles y token
+            User.findById(user.id, (err, userWithRoles) => {
+                if (err) {
+                    return res.status(501).json({
+                        success: false,
+                        message: 'Usuario actualizado pero hubo un error al obtener la información completa',
+                        error: err
+                    })
+                }
+
+                if (!userWithRoles) {
+                    return res.status(404).json({
+                        success: false,
+                        message: 'Usuario actualizado pero no se encontró en la base de datos'
+                    })
+                }
+
+                // Parsear roles si viene como string
+                if (typeof userWithRoles.roles === 'string') {
+                    try {
+                        userWithRoles.roles = JSON.parse(userWithRoles.roles);
+                    } catch (e) {
+                        console.error('Error parsing roles:', e);
+                        userWithRoles.roles = [];
+                    }
+                }
+
+                // Mantener el token de sesión original
+                userWithRoles.session_token = user.session_token;
+
+                return res.status(201).json({
+                    success: true,
+                    message: 'El usuario se actualizo correctamente',
+                    data: userWithRoles
+                })
+            });
         })
     },
 
