@@ -269,12 +269,17 @@ Order.create = (order, result) => {
             orders(
                 id_client,
                 id_address,
+                client_name,
+                client_phone,
+                delivery_address,
+                delivery_neighborhood,
+                anotaciones,
                 status,
                 timestamp,
                 created_at,
                 updated_at
             )
-        values(?, ?, ?, ?, ?, ?);
+        values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
     `;
 
     db.query(
@@ -282,6 +287,11 @@ Order.create = (order, result) => {
         [
             order.id_client,
             order.id_address,
+            order.client_name || null,
+            order.client_phone || null,
+            order.delivery_address || null,
+            order.delivery_neighborhood || null,
+            order.anotaciones || null,
             'PAGADO', //1. PAGADO, 2. DESPACHADO 3. EN CAMINO, 4. ENTREGADO
             Date.now(),
             new Date(),

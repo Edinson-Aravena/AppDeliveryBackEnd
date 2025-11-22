@@ -1,6 +1,34 @@
 const db = require('../config/config');
 const Address = {};
 
+Address.findById = (id, result) => {
+    const sql = `
+        select 
+            CONVERT(id,char) as id, 
+            address, 
+            neighborhood, 
+            lat, 
+            lng,
+            CONVERT(id_user,char) as id_user
+        from 
+            address
+        where 
+            id = ?
+    `;
+
+    db.query(
+        sql,
+        [id],
+        (err, data) => {
+            if (err) {
+                console.log('Error:' + err);
+                result(err, null);
+            } else {
+                result(null, data[0]);
+            }
+        });
+}
+
 Address.findByUser = (id_user, result) => {
     const sql = `
         select 

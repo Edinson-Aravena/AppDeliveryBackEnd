@@ -75,14 +75,46 @@ module.exports = {
             // Si el pago fue aprobado y se envió información de la orden, crear la orden en la BD
             if (simulatedPaymentResponse.status === 'approved' && order) {
                 try {
+                    console.log('=== Intentando crear orden ===');
+                    console.log('Order data:', JSON.stringify(order, null, 2));
+                    
                     const Order = require('../models/order');
                     const OrderHasProducts = require('../models/order_has_products');
+                    const User = require('../models/user');
+                    const Address = require('../models/address');
+                    
+                    // Obtener datos del cliente y dirección para guardar copia histórica
+                    let clientData = null;
+                    let addressData = null;
+                    
+                    if (order.id_client) {
+                        clientData = await new Promise((resolve, reject) => {
+                            User.findById(order.id_client, (err, user) => {
+                                if (err) resolve(null);
+                                else resolve(user);
+                            });
+                        });
+                    }
+                    
+                    if (order.id_address) {
+                        addressData = await new Promise((resolve, reject) => {
+                            Address.findById(order.id_address, (err, address) => {
+                                if (err) resolve(null);
+                                else resolve(address);
+                            });
+                        });
+                    }
                     
                     // Crear la orden en la base de datos usando Promise para convertir el callback
                     const newOrderId = await new Promise((resolve, reject) => {
                         Order.create({
                             id_client: order.id_client,
                             id_address: order.id_address,
+                            client_name: clientData?.name,
+                            client_phone: clientData?.phone,
+                            delivery_address: addressData?.address,
+                            delivery_neighborhood: addressData?.neighborhood,
+                            anotaciones: order.anotaciones,
                             status: 'PAGADO',
                             timestamp: Date.now()
                         }, (err, orderId) => {
